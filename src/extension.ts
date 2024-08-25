@@ -142,7 +142,7 @@ async function init(
 		}
 	});
 
-	const changesTree = new PullRequestChangesTreeDataProvider(context, git, reposManager);
+	const changesTree = new PullRequestChangesTreeDataProvider(context, git, reposManager, tree);
 	context.subscriptions.push(changesTree);
 
 	const activePrViewCoordinator = new WebviewViewCoordinator(context);

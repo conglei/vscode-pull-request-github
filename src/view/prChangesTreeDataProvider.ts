@@ -19,6 +19,7 @@ import { GitFileChangeNode } from './treeNodes/fileChangeNode';
 import { RepositoryChangesNode } from './treeNodes/repositoryChangesNode';
 import { BaseTreeNode, TreeNode } from './treeNodes/treeNode';
 import { TreeUtils } from './treeNodes/treeUtils';
+import { PullRequestsTreeDataProvider } from './prsTreeDataProvider';
 
 export class PullRequestChangesTreeDataProvider extends vscode.Disposable implements vscode.TreeDataProvider<TreeNode>, BaseTreeNode {
 	private _onDidChangeTreeData = new vscode.EventEmitter<TreeNode | void>();
@@ -33,7 +34,7 @@ export class PullRequestChangesTreeDataProvider extends vscode.Disposable implem
 		return this._view;
 	}
 
-	constructor(private _context: vscode.ExtensionContext, private _git: GitApiImpl, private _reposManager: RepositoriesManager) {
+	constructor(private _context: vscode.ExtensionContext, private _git: GitApiImpl, private _reposManager: RepositoriesManager, private _pullReuestsTreeDataProvider: PullRequestsTreeDataProvider) {
 		super(() => this.dispose());
 		this._view = vscode.window.createTreeView('prStatus:github', {
 			treeDataProvider: this,
@@ -98,7 +99,8 @@ export class PullRequestChangesTreeDataProvider extends vscode.Disposable implem
 			pullRequestModel,
 			pullRequestManager,
 			reviewModel,
-			progress
+			progress,
+			this._pullReuestsTreeDataProvider,
 		);
 		this._pullRequestManagerMap.set(pullRequestManager, node);
 		this.updateViewTitle();

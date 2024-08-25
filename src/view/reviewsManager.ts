@@ -48,7 +48,7 @@ export class ReviewsManager {
 				if (e.affectsConfiguration('githubPullRequests.showInSCM')) {
 					if (this._prFileChangesProvider) {
 						this._prFileChangesProvider.dispose();
-						this._prFileChangesProvider = new PullRequestChangesTreeDataProvider(this._context, this._gitApi, this._reposManager);
+						this._prFileChangesProvider = new PullRequestChangesTreeDataProvider(this._context, this._gitApi, this._reposManager, this._prsTreeDataProvider);
 
 						for (const reviewManager of this._reviewManagers) {
 							reviewManager.updateState(true);

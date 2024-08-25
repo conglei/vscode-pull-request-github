@@ -13,12 +13,15 @@ import { ProgressHelper } from '../progress';
 import { ReviewModel } from '../reviewModel';
 import { CommitsNode } from './commitsCategoryNode';
 import { DescriptionNode } from './descriptionNode';
+import { DownstreamPullRequestsNode } from './downstreamPullRequestsNode';
 import { FilesCategoryNode } from './filesCategoryNode';
 import { BaseTreeNode, TreeNode } from './treeNode';
+import { PullRequestsTreeDataProvider } from '../prsTreeDataProvider';
 
 export class RepositoryChangesNode extends DescriptionNode implements vscode.TreeItem {
 	private _filesCategoryNode?: FilesCategoryNode;
 	private _commitsCategoryNode?: CommitsNode;
+	private _downstreamPRsNode?: DownstreamPullRequestsNode;
 	public description?: string;
 	readonly collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 
@@ -29,7 +32,8 @@ export class RepositoryChangesNode extends DescriptionNode implements vscode.Tre
 		private _pullRequest: PullRequestModel,
 		private _pullRequestManager: FolderRepositoryManager,
 		private _reviewModel: ReviewModel,
-		private _progress: ProgressHelper
+		private _progress: ProgressHelper,
+		private _pullReuestsTreeDataProvider: PullRequestsTreeDataProvider,
 	) {
 		super(parent, _pullRequest.title, _pullRequest, _pullRequestManager.repository, _pullRequestManager);
 		// Cause tree values to be filled
@@ -75,16 +79,22 @@ export class RepositoryChangesNode extends DescriptionNode implements vscode.Tre
 
 	async getChildren(): Promise<TreeNode[]> {
 		await this._progress.progress;
-		if (!this._filesCategoryNode || !this._commitsCategoryNode) {
-			Logger.appendLine(`Creating file and commit nodes for PR #${this.pullRequestModel.number}`, PR_TREE);
+		if (!this._filesCategoryNode || !this._commitsCategoryNode || !this._downstreamPRsNode) {
+			Logger.appendLine(`Creating file, commit, and downstream RPs nodes for PR #${this.pullRequestModel.number}`, PR_TREE);
 			this._filesCategoryNode = new FilesCategoryNode(this.parent, this._reviewModel, this._pullRequest);
 			this._commitsCategoryNode = new CommitsNode(
 				this.parent,
 				this._pullRequestManager,
 				this._pullRequest,
 			);
+			this._downstreamPRsNode = new DownstreamPullRequestsNode(
+				this.parent,
+				this._pullRequestManager,
+				this._pullRequest,
+				this._pullReuestsTreeDataProvider,
+			);
 		}
-		this.children = [this._filesCategoryNode, this._commitsCategoryNode];
+		this.children = [this._filesCategoryNode, this._commitsCategoryNode, this._downstreamPRsNode];
 		return this.children;
 	}
 
